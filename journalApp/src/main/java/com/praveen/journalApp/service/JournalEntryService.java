@@ -23,13 +23,13 @@ public class JournalEntryService {
     @Autowired
     private UserService userService;
 
-
-    public void saveEntry(JournalEntry journalEntry){
+    public void saveEntry(JournalEntry journalEntry) {
         journalEntry.setDate(LocalDateTime.now());
         journalEntryRepository.save(journalEntry);
     }
+
     @Transactional
-    public void saveEntry(JournalEntry journalEntry, String userName){
+    public void saveEntry(JournalEntry journalEntry, String userName) {
         User user = userService.findByUserName(userName);
         journalEntry.setDate(LocalDateTime.now());
         JournalEntry saved = journalEntryRepository.save(journalEntry);
@@ -37,24 +37,33 @@ public class JournalEntryService {
         userService.saveEntry(user);
     }
 
-    public List<JournalEntry> getAll(){
+    public List<JournalEntry> getAll() {
         return new ArrayList<JournalEntry>(journalEntryRepository.findAll());
     }
 
-    public Optional<JournalEntry> findById(ObjectId id){
+    public Optional<JournalEntry> findById(ObjectId id) {
         return journalEntryRepository.findById(id);
     }
 
-    public void deleteById(ObjectId id){
+    public void deleteById(ObjectId id) {
         journalEntryRepository.deleteById(id);
     }
 
     @Transactional
-    public void deleteById(ObjectId id, String userName){
-        User user = userService.findByUserName(userName);
-        user.getJournalEntries().removeIf(x-> x.getId().equals(id));
-        journalEntryRepository.deleteById(id);
-        userService.saveEntry(user);
+    public Boolean deleteById(ObjectId id, String userName) {
+        try {
+            boolean removed = false;
+            User user = userService.findByUserName(userName);
+            removed = user.getJournalEntries().removeIf(x -> x.getId().equals(id));
+            if (removed) {
+                journalEntryRepository.deleteById(id);
+                userService.saveEntry(user);
+            }
+            return removed;
+        } catch (Exception e) {
+            System.out.println(e);
+            throw new RuntimeException("An error occured while deleting entry", e);
+        }
     }
 
 }
