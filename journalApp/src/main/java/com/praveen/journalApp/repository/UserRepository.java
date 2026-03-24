@@ -7,5 +7,5 @@ import com.praveen.journalApp.entity.User;
 
 public interface UserRepository extends MongoRepository<User, ObjectId>{
     User findByUserName(String userName);
-
+    User deleteByUserName(String userName);
 }
