@@ -25,7 +25,7 @@ public class UserRepositoryImpl {
     public List<User> getUserForSA() {
         Query query = new Query(
                 Criteria.where("sentimentAnalysis").is(true)
-                        .and("email").exists(true).ne(""));
+                        .and("email").regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$"));
         List<User> users = mongoTemplate.find(query, User.class);
         return users;
     }

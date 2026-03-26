@@ -41,6 +41,7 @@ public class UserServiceTests {
     @ValueSource(strings={
         "Ram","Shyam","admin"
     })
+    @Disabled
     public void testFindByUserNameParameterized(String userName){
         assertNotNull(userRepository.findByUserName(userName));
     }

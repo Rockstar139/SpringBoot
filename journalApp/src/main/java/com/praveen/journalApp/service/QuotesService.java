@@ -12,7 +12,7 @@ import com.praveen.journalApp.cache.AppCache;
 
 @Component
 public class QuotesService {
-    
+
     @Autowired
     private RestTemplate restTemplate;
     @Autowired
@@ -23,11 +23,24 @@ public class QuotesService {
 
     // String api = "https://dummyjson.com/quotes/1";
 
+    @Autowired
+    private RedisService redisService;
 
-    public QuoteResponse getQuote(){
-        ResponseEntity<QuoteResponse> response = restTemplate.exchange(appCache.appCache.get(AppCache.keys.JOURNAL_API.toString()), HttpMethod.GET, null, QuoteResponse.class);
-        QuoteResponse body = response.getBody();
-        return body;
+    public QuoteResponse getQuote(String quoteNo) {
+        QuoteResponse quoteResponse = redisService.get("quote_no_" + quoteNo, QuoteResponse.class);
+        if (quoteResponse != null) {
+            return quoteResponse;
+        } else {
+            ResponseEntity<QuoteResponse> response = restTemplate.exchange(
+                    appCache.appCache.get(AppCache.keys.JOURNAL_API.toString()).replace("<quote>", quoteNo),
+                    HttpMethod.GET, null, QuoteResponse.class);
+            QuoteResponse body = response.getBody();
+            if (body != null) {
+                redisService.set("quote_no_" + quoteNo.toString(), body, 300l);
+            }
+
+            return body;
+        }
     }
 
 }

@@ -28,7 +28,7 @@ public class UserControllerV2 {
         org.springframework.security.core.Authentication authentication = SecurityContextHolder.getContext()
                 .getAuthentication();
         String userName = authentication.getName();
-        return new ResponseEntity<>("Hi " + userName + " Today's quote is " + quotesService.getQuote().getQuote(), HttpStatus.OK);
+        return new ResponseEntity<>("Hi " + userName + " Today's quote is " + quotesService.getQuote("2").getQuote(), HttpStatus.OK);
     }
 
     @PutMapping
